@@ -57,7 +57,7 @@
 // The Get, Put, Post and Delete methods sign and invoke a request using the
 // supplied net/http Client. These methods are easy to use, but not as flexible
 // as constructing a request using one of the low-level methods.
-package oauth // import "github.com/garyburd/go-oauth/oauth"
+package oauth // import "github.com/bergotorino/go-oauth/oauth"
 
 import (
 	"bytes"
@@ -227,7 +227,7 @@ func init() {
 
 // nonce returns a unique string.
 func nonce() string {
-	return strconv.FormatUint(atomic.AddUint64(&nonceCounter, 1), 16)
+	return strconv.FormatUint(atomic.AddUint64(&nonceCounter, 1), 10)
 }
 
 // SignatureMethod identifies a signature method.
@@ -302,12 +302,11 @@ func (c *Client) oauthParams(credentials *Credentials, method string, u *url.URL
 		"oauth_consumer_key":     c.Credentials.Token,
 		"oauth_signature_method": c.SignatureMethod.String(),
 		"oauth_version":          "1.0",
+		"realm":                  "OAuth",
 	}
 
-	if c.SignatureMethod != PLAINTEXT {
-		oauthParams["oauth_timestamp"] = strconv.FormatInt(time.Now().Unix(), 10)
-		oauthParams["oauth_nonce"] = nonce()
-	}
+	oauthParams["oauth_timestamp"] = strconv.FormatInt(time.Now().Unix(), 10)
+	oauthParams["oauth_nonce"] = nonce()
 
 	if credentials != nil {
 		oauthParams["oauth_token"] = credentials.Token
@@ -389,13 +388,15 @@ func (c *Client) SignParam(credentials *Credentials, method, urlStr string, para
 }
 
 var oauthKeys = []string{
-	"oauth_consumer_key",
+	"realm",
 	"oauth_nonce",
-	"oauth_signature",
-	"oauth_signature_method",
 	"oauth_timestamp",
-	"oauth_token",
+	"oauth_consumer_key",
+	"oauth_signature_method",
 	"oauth_version",
+	"oauth_token",
+	"oauth_signature",
+	"accept",
 }
 
 func (c *Client) authorizationHeader(credentials *Credentials, method string, u *url.URL, params url.Values) (string, error) {
@@ -548,6 +549,12 @@ func (c *Client) RequestTemporaryCredentials(client *http.Client, callbackURL st
 // credentials.
 func (c *Client) RequestToken(client *http.Client, temporaryCredentials *Credentials, verifier string) (*Credentials, url.Values, error) {
 	params := make(url.Values)
+	params.Set("oauth_signature_method", "PLAINTEXT")
+	params.Set("oauth_token", temporaryCredentials.Token)
+	params.Set("oauth_consumer_key", c.Credentials.Token)
+	params.Set("oauth_signature", "&"+temporaryCredentials.Secret)
+	params.Set("accept", "application/json")
+
 	if verifier != "" {
 		params.Set("oauth_verifier", verifier)
 	}

@@ -15,7 +15,7 @@
 package oauth_test
 
 import (
-	"github.com/garyburd/go-oauth/oauth"
+	"github.com/bergotorino/go-oauth/oauth"
 	"net/http"
 	"net/url"
 	"strings"

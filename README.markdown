@@ -7,6 +7,8 @@ Go-OAuth is a [Go](http://golang.org/) client for the OAuth 1.0, OAuth 1.0a and
 [RFC 5849](https://tools.ietf.org/html/rfc5849) Protocols. The package supports
 HMAC-SHA1, RSA-SHA1 and PLAINTEXT signatures.
 
+This
+
 ## Installation
 
     go get github.com/garyburd/go-oauth/oauth
