@@ -72,7 +72,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"sort"
 	"strconv"
@@ -465,6 +467,12 @@ func (c *Client) Get(client *http.Client, credentials *Credentials, urlStr strin
 	if client == nil {
 		client = http.DefaultClient
 	}
+	requestDump, err := httputil.DumpRequest(req, true)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println("\n=========== NEW REQUEST ============================\n")
+	log.Println(string(requestDump))
 	return client.Do(req)
 }
 
