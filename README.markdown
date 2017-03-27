@@ -7,11 +7,20 @@ Go-OAuth is a [Go](http://golang.org/) client for the OAuth 1.0, OAuth 1.0a and
 [RFC 5849](https://tools.ietf.org/html/rfc5849) Protocols. The package supports
 HMAC-SHA1, RSA-SHA1 and PLAINTEXT signatures.
 
-This
+This version supports [Launchpad.net](https://launchpad.net) and the work is
+based on [garyburd go-oauth](https://github.com/garyburd/go-oauth)
 
 ## Installation
 
-    go get github.com/garyburd/go-oauth/oauth
+    go get github.com/bergotorino/go-oauth/oauth
+
+## Usage
+
+The clients using this library must set additional headers in order to be able
+to communicate with Launchpad. These are:
+
+     - "accept" = "application/json"
+     - "accept-encoding" = "gzip, deflate"
 
 ## License
 
