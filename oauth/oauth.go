@@ -258,6 +258,23 @@ type Credentials struct {
 	Secret string // Also known as consumer secret or access token secret.
 }
 
+// Abstract client interface
+type AbstractClient interface {
+	SignForm(credentials *Credentials, method, urlStr string, form url.Values) error
+	SignParam(credentials *Credentials, method, urlStr string, params url.Values)
+	AuthorizationHeader(credentials *Credentials, method string, u *url.URL, params url.Values) string
+	SetAuthorizationHeader(header http.Header, credentials *Credentials, method string, u *url.URL, params url.Values) error
+	Get(client *http.Client, credentials *Credentials, urlStr string, form url.Values) (*http.Response, error)
+	Post(client *http.Client, credentials *Credentials, urlStr string, form url.Values) (*http.Response, error)
+	Delete(client *http.Client, credentials *Credentials, urlStr string, form url.Values) (*http.Response, error)
+	Put(client *http.Client, credentials *Credentials, urlStr string, form url.Values) (*http.Response, error)
+	RequestTemporaryCredentials(client *http.Client, callbackURL string, additionalParams url.Values) (*Credentials, error)
+	RequestToken(client *http.Client, temporaryCredentials *Credentials, verifier string) (*Credentials, url.Values, error)
+	RequestTokenXAuth(client *http.Client, temporaryCredentials *Credentials, user, password string) (*Credentials, url.Values, error)
+	AuthorizationURL(temporaryCredentials *Credentials, additionalParams url.Values) string
+	SetCustomHeader(key string, value string)
+}
+
 // Client represents an OAuth client.
 type Client struct {
 	// Credentials specifies the client key and secret.
@@ -444,6 +461,14 @@ func (c *Client) SetAuthorizationHeader(header http.Header, credentials *Credent
 	}
 	header.Set("Authorization", v)
 	return nil
+}
+
+func (c *Client) SetCustomHeader(key string, value string) {
+	if c.Header == nil {
+		c.Header = make(map[string][]string)
+	}
+
+	c.Header.Set(key, value)
 }
 
 // Get issues a GET to the specified URL with form added as a query string.
